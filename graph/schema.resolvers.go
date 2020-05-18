@@ -5,25 +5,30 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/AlexKoppara/Demeter/graph/generated"
 	"github.com/AlexKoppara/Demeter/graph/model"
 )
 
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *queryResolver) Restaurants(ctx context.Context) ([]*model.Restaurant, error) {
+	var restaurants []*model.Restaurant
+	restaurants = append(restaurants, &model.Restaurant{
+		ID:      "restaurant_1",
+		Name:    "Testaurant",
+		Addr1:   "123 Sesame St",
+		City:    "Brooklyn",
+		State:   "NY",
+		Country: "USA",
+		Zip:     "12345",
+		IsLive:  true,
+		Menu: &model.Menu{
+			ID: "menu_1",
+		},
+	})
+	return restaurants, nil
 }
-
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-// Mutation returns generated.MutationResolver implementation.
-func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
-type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

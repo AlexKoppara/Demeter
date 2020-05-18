@@ -2,19 +2,27 @@
 
 package model
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+type Menu struct {
+	ID       string      `json:"id"`
+	MeuItems []*MenuItem `json:"meuItems"`
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
+type MenuItem struct {
+	ID      string `json:"id"`
+	Menu    *Menu  `json:"menu"`
+	Name    string `json:"name"`
+	Keyword string `json:"keyword"`
 }
 
-type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+type Restaurant struct {
+	ID      string  `json:"id"`
+	Name    string  `json:"name"`
+	Addr1   string  `json:"addr1"`
+	Addr2   *string `json:"addr2"`
+	City    string  `json:"city"`
+	State   string  `json:"state"`
+	Country string  `json:"country"`
+	Zip     string  `json:"zip"`
+	IsLive  bool    `json:"isLive"`
+	Menu    *Menu   `json:"menu"`
 }
