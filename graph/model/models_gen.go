@@ -26,3 +26,5 @@ type Restaurant struct {
 	IsLive  bool    `json:"isLive"`
 	Menu    *Menu   `json:"menu"`
 }
+
+func (Restaurant) IsEntity() {}

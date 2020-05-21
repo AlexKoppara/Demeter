@@ -2,7 +2,7 @@
 #
 # https://gqlgen.com/getting-started/
 
-type Restaurant {
+type Restaurant @key(fields: "id") {
   id: ID!
   name: String!
   addr1: String!
