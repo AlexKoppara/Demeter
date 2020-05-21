@@ -12,4 +12,4 @@ update `entity.resolvers.go` and `schema.resolvers.go`
 
 to run: `go run ./server.go`
 
-visit `http://localhost:8080/` for GraphQL playground
+visit `http://localhost:8001/` for GraphQL playground

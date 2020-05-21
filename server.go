@@ -11,7 +11,7 @@ import (
 	"github.com/AlexKoppara/Demeter/graph/generated"
 )
 
-const defaultPort = "8080"
+const defaultPort = "8001"
 
 func main() {
 	port := os.Getenv("PORT")
