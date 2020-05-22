@@ -46,6 +46,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Entity struct {
+		FindMenuItemByID   func(childComplexity int, id string) int
 		FindRestaurantByID func(childComplexity int, id string) int
 	}
 
@@ -55,10 +56,11 @@ type ComplexityRoot struct {
 	}
 
 	MenuItem struct {
-		ID      func(childComplexity int) int
-		Keyword func(childComplexity int) int
-		Menu    func(childComplexity int) int
-		Name    func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Keyword      func(childComplexity int) int
+		Menu         func(childComplexity int) int
+		Name         func(childComplexity int) int
+		PriceInCents func(childComplexity int) int
 	}
 
 	Query struct {
@@ -86,6 +88,7 @@ type ComplexityRoot struct {
 }
 
 type EntityResolver interface {
+	FindMenuItemByID(ctx context.Context, id string) (*model.MenuItem, error)
 	FindRestaurantByID(ctx context.Context, id string) (*model.Restaurant, error)
 }
 type QueryResolver interface {
@@ -106,6 +109,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Entity.findMenuItemByID":
+		if e.complexity.Entity.FindMenuItemByID == nil {
+			break
+		}
+
+		args, err := ec.field_Entity_findMenuItemByID_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Entity.FindMenuItemByID(childComplexity, args["id"].(string)), true
 
 	case "Entity.findRestaurantByID":
 		if e.complexity.Entity.FindRestaurantByID == nil {
@@ -160,6 +175,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MenuItem.Name(childComplexity), true
+
+	case "MenuItem.priceInCents":
+		if e.complexity.MenuItem.PriceInCents == nil {
+			break
+		}
+
+		return e.complexity.MenuItem.PriceInCents(childComplexity), true
 
 	case "Query.restaurants":
 		if e.complexity.Query.Restaurants == nil {
@@ -336,11 +358,12 @@ type Menu {
   meuItems: [MenuItem!]
 }
 
-type MenuItem {
+type MenuItem @key(fields: "id") {
   id: ID!
   menu: Menu!
   name: String!
   keyword: String!
+  priceInCents: Int!
 }
 
 extend type Query {
@@ -368,11 +391,12 @@ directive @extends on OBJECT
 `, BuiltIn: true},
 	&ast.Source{Name: "federation/entity.graphql", Input: `
 # a union of all types that use the @key directive
-union _Entity = Restaurant
+union _Entity = MenuItem | Restaurant
 
 # fake type to build resolver interfaces for users to implement
 type Entity {
-		findRestaurantByID(id: ID!,): Restaurant!
+		findMenuItemByID(id: ID!,): MenuItem!
+	findRestaurantByID(id: ID!,): Restaurant!
 
 }
 
@@ -391,6 +415,20 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Entity_findMenuItemByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Entity_findRestaurantByID_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -469,6 +507,47 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _Entity_findMenuItemByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Entity",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Entity_findMenuItemByID_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Entity().FindMenuItemByID(rctx, args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.MenuItem)
+	fc.Result = res
+	return ec.marshalNMenuItem2ᚖgithubᚗcomᚋAlexKopparaᚋDemeterᚋgraphᚋmodelᚐMenuItem(ctx, field.Selections, res)
+}
 
 func (ec *executionContext) _Entity_findRestaurantByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
@@ -710,6 +789,40 @@ func (ec *executionContext) _MenuItem_keyword(ctx context.Context, field graphql
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MenuItem_priceInCents(ctx context.Context, field graphql.CollectedField, obj *model.MenuItem) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "MenuItem",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PriceInCents, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_restaurants(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2321,6 +2434,13 @@ func (ec *executionContext) __Entity(ctx context.Context, sel ast.SelectionSet, 
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case model.MenuItem:
+		return ec._MenuItem(ctx, sel, &obj)
+	case *model.MenuItem:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._MenuItem(ctx, sel, obj)
 	case model.Restaurant:
 		return ec._Restaurant(ctx, sel, &obj)
 	case *model.Restaurant:
@@ -2352,6 +2472,20 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet) g
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Entity")
+		case "findMenuItemByID":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Entity_findMenuItemByID(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "findRestaurantByID":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -2406,7 +2540,7 @@ func (ec *executionContext) _Menu(ctx context.Context, sel ast.SelectionSet, obj
 	return out
 }
 
-var menuItemImplementors = []string{"MenuItem"}
+var menuItemImplementors = []string{"MenuItem", "_Entity"}
 
 func (ec *executionContext) _MenuItem(ctx context.Context, sel ast.SelectionSet, obj *model.MenuItem) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, menuItemImplementors)
@@ -2434,6 +2568,11 @@ func (ec *executionContext) _MenuItem(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "keyword":
 			out.Values[i] = ec._MenuItem_keyword(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "priceInCents":
+			out.Values[i] = ec._MenuItem_priceInCents(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -2878,6 +3017,20 @@ func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface
 
 func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	res := graphql.MarshalID(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	return graphql.UnmarshalInt(v)
+}
+
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")

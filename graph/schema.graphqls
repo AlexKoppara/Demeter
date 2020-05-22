@@ -20,11 +20,12 @@ type Menu {
   meuItems: [MenuItem!]
 }
 
-type MenuItem {
+type MenuItem @key(fields: "id") {
   id: ID!
   menu: Menu!
   name: String!
   keyword: String!
+  priceInCents: Int!
 }
 
 extend type Query {

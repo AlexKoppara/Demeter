@@ -10,6 +10,19 @@ import (
 	"github.com/AlexKoppara/Demeter/graph/model"
 )
 
+func (r *entityResolver) FindMenuItemByID(ctx context.Context, id string) (*model.MenuItem, error) {
+	menuItem := &model.MenuItem{
+		ID: "menu_item_1",
+		Menu: &model.Menu{
+			ID: "menu_1",
+		},
+		Name:         "chicken wings",
+		Keyword:      "wings",
+		PriceInCents: 1500,
+	}
+	return menuItem, nil
+}
+
 func (r *entityResolver) FindRestaurantByID(ctx context.Context, id string) (*model.Restaurant, error) {
 	restaurant := &model.Restaurant{
 		ID:      "restaurant_1",

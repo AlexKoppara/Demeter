@@ -8,11 +8,14 @@ type Menu struct {
 }
 
 type MenuItem struct {
-	ID      string `json:"id"`
-	Menu    *Menu  `json:"menu"`
-	Name    string `json:"name"`
-	Keyword string `json:"keyword"`
+	ID           string `json:"id"`
+	Menu         *Menu  `json:"menu"`
+	Name         string `json:"name"`
+	Keyword      string `json:"keyword"`
+	PriceInCents int    `json:"priceInCents"`
 }
+
+func (MenuItem) IsEntity() {}
 
 type Restaurant struct {
 	ID      string  `json:"id"`
