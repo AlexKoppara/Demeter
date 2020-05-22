@@ -10,9 +10,8 @@ import (
 	"github.com/AlexKoppara/Demeter/graph/model"
 )
 
-func (r *queryResolver) Restaurants(ctx context.Context) ([]*model.Restaurant, error) {
-	var restaurants []*model.Restaurant
-	restaurants = append(restaurants, &model.Restaurant{
+func (r *queryResolver) Restaurant(ctx context.Context) (*model.Restaurant, error) {
+	restaurant := &model.Restaurant{
 		ID:      "restaurant_1",
 		Name:    "Testaurant",
 		Addr1:   "123 Sesame St",
@@ -21,11 +20,33 @@ func (r *queryResolver) Restaurants(ctx context.Context) ([]*model.Restaurant, e
 		Country: "USA",
 		Zip:     "12345",
 		IsLive:  true,
-		Menu: &model.Menu{
-			ID: "menu_1",
-		},
+	}
+
+	var menuItems []*model.MenuItem
+	menuItems = append(menuItems, &model.MenuItem{
+		ID:           "menu_item_1",
+		Restaurant:   restaurant,
+		Name:         "chicken wings",
+		Keyword:      "wings",
+		PriceInCents: 1500,
 	})
-	return restaurants, nil
+	menuItems = append(menuItems, &model.MenuItem{
+		ID:           "menu_item_2",
+		Restaurant:   restaurant,
+		Name:         "french fries",
+		Keyword:      "fries",
+		PriceInCents: 500,
+	})
+	menuItems = append(menuItems, &model.MenuItem{
+		ID:           "menu_item_3",
+		Restaurant:   restaurant,
+		Name:         "pizza",
+		Keyword:      "pizza",
+		PriceInCents: 2000,
+	})
+
+	restaurant.MeuItems = menuItems
+	return restaurant, nil
 }
 
 // Query returns generated.QueryResolver implementation.

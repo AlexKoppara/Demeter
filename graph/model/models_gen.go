@@ -2,32 +2,27 @@
 
 package model
 
-type Menu struct {
-	ID       string      `json:"id"`
-	MeuItems []*MenuItem `json:"meuItems"`
-}
-
 type MenuItem struct {
-	ID           string `json:"id"`
-	Menu         *Menu  `json:"menu"`
-	Name         string `json:"name"`
-	Keyword      string `json:"keyword"`
-	PriceInCents int    `json:"priceInCents"`
+	ID           string      `json:"id"`
+	Restaurant   *Restaurant `json:"restaurant"`
+	Name         string      `json:"name"`
+	Keyword      string      `json:"keyword"`
+	PriceInCents int         `json:"priceInCents"`
 }
 
 func (MenuItem) IsEntity() {}
 
 type Restaurant struct {
-	ID      string  `json:"id"`
-	Name    string  `json:"name"`
-	Addr1   string  `json:"addr1"`
-	Addr2   *string `json:"addr2"`
-	City    string  `json:"city"`
-	State   string  `json:"state"`
-	Country string  `json:"country"`
-	Zip     string  `json:"zip"`
-	IsLive  bool    `json:"isLive"`
-	Menu    *Menu   `json:"menu"`
+	ID       string      `json:"id"`
+	Name     string      `json:"name"`
+	Addr1    string      `json:"addr1"`
+	Addr2    *string     `json:"addr2"`
+	City     string      `json:"city"`
+	State    string      `json:"state"`
+	Country  string      `json:"country"`
+	Zip      string      `json:"zip"`
+	IsLive   bool        `json:"isLive"`
+	MeuItems []*MenuItem `json:"meuItems"`
 }
 
 func (Restaurant) IsEntity() {}

@@ -11,21 +11,32 @@ import (
 )
 
 func (r *entityResolver) FindMenuItemByID(ctx context.Context, id string) (*model.MenuItem, error) {
-	menuItem := &model.MenuItem{
-		ID: "menu_item_1",
-		Menu: &model.Menu{
-			ID: "menu_1",
-		},
-		Name:         "chicken wings",
-		Keyword:      "wings",
-		PriceInCents: 1500,
+	var menuItem *model.MenuItem
+	switch id {
+	case "menu_item_1":
+		menuItem = &model.MenuItem{
+			ID:           "menu_item_1",
+			Name:         "chicken wings",
+			Keyword:      "wings",
+			PriceInCents: 1500,
+		}
+	case "menu_item_2":
+		menuItem = &model.MenuItem{
+			ID:           "menu_item_2",
+			Name:         "french fries",
+			Keyword:      "fries",
+			PriceInCents: 500,
+		}
+	case "menu_item_3":
+		menuItem = &model.MenuItem{
+			ID:           "menu_item_3",
+			Name:         "pizza",
+			Keyword:      "pizza",
+			PriceInCents: 2000,
+		}
 	}
-	return menuItem, nil
-}
-
-func (r *entityResolver) FindRestaurantByID(ctx context.Context, id string) (*model.Restaurant, error) {
-	restaurant := &model.Restaurant{
-		ID:      "restaurant_1",
+	menuItem.Restaurant = &model.Restaurant{
+		ID:      "restaurant_" + id,
 		Name:    "Testaurant",
 		Addr1:   "123 Sesame St",
 		City:    "Brooklyn",
@@ -33,9 +44,20 @@ func (r *entityResolver) FindRestaurantByID(ctx context.Context, id string) (*mo
 		Country: "USA",
 		Zip:     "12345",
 		IsLive:  true,
-		Menu: &model.Menu{
-			ID: "menu_1",
-		},
+	}
+	return menuItem, nil
+}
+
+func (r *entityResolver) FindRestaurantByID(ctx context.Context, id string) (*model.Restaurant, error) {
+	restaurant := &model.Restaurant{
+		ID:      "restaurant_" + id,
+		Name:    "Testaurant",
+		Addr1:   "123 Sesame St",
+		City:    "Brooklyn",
+		State:   "NY",
+		Country: "USA",
+		Zip:     "12345",
+		IsLive:  true,
 	}
 	return restaurant, nil
 }

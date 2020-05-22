@@ -12,24 +12,19 @@ type Restaurant @key(fields: "id") {
   country: String!
   zip: String!
   isLive: Boolean!
-  menu: Menu!
-}
-
-type Menu {
-  id: ID!
-  meuItems: [MenuItem!]
+  meuItems: [MenuItem!]!
 }
 
 type MenuItem @key(fields: "id") {
   id: ID!
-  menu: Menu!
+  restaurant: Restaurant!
   name: String!
   keyword: String!
   priceInCents: Int!
 }
 
 extend type Query {
-  restaurants: [Restaurant!]!
+  restaurant: Restaurant!
 }
 
 # input NewTodo {
